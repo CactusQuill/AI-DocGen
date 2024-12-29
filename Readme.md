@@ -1,8 +1,11 @@
-# ScreenDoc 📸 - Automated Process Documentation Tool
+# AI-DocGen 📸 - Automated Process Documentation Tool
 
-ScreenDoc is a powerful Python-based tool that automatically generates professional documentation from screen recordings. It uses AI to detect steps, analyze screenshots, and create detailed documentation in multiple formats.
 
-![ScreenDoc Logo](assets/logo.png)
+![AI-DocGen Logo](images/logo.png)
+
+
+
+AI-DocGen is a powerful Python-based tool that automatically generates professional documentation from screen recordings. It uses AI to detect steps, analyze screenshots, and create detailed documentation in multiple formats.
 
 ## 🌟 Features
 
@@ -26,8 +29,8 @@ ScreenDoc is a powerful Python-based tool that automatically generates professio
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ScreenDoc.git
-   cd ScreenDoc
+   git clone https://github.com/CactusQuill/AI-DocGen.git
+   cd AI-DocGen
    ```
 
 2. Create and activate a virtual environment:
@@ -136,7 +139,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 Documentation
 
-For detailed documentation, visit our [Wiki](https://github.com/yourusername/ScreenDoc/wiki).
+For detailed documentation, visit our [Wiki](https://github.com/CactusQuill/AI-DocGen/wiki).
 
 ## 🐛 Troubleshooting
 
@@ -159,20 +162,19 @@ For detailed documentation, visit our [Wiki](https://github.com/yourusername/Scr
 
 ### Getting Help
 
-- Open an [Issue](https://github.com/yourusername/ScreenDoc/issues)
-- Check existing [Discussions](https://github.com/yourusername/ScreenDoc/discussions)
-- Read our [FAQ](https://github.com/yourusername/ScreenDoc/wiki/FAQ)
+- Open an [Issue](https://github.com/CactusQuill/AI-DocGen/issues)
+- Check existing [Discussions](https://github.com/CactusQuill/AI-DocGen/discussions)
+- Read our [FAQ](https://github.com/CactusQuill/AI-DocGen/wiki/FAQ)
 
 ## 🔄 Updates
 
 Stay updated with new releases:
 - Watch this repository
-- Follow our [Release Notes](https://github.com/yourusername/ScreenDoc/releases)
-- Join our [Discord Community](your_discord_link)
+- Follow our [Release Notes](https://github.com/CactusQuill/AI-DocGen/releases)
 
 ## 📊 Project Status
 
-ScreenDoc is under active development. We're working on:
+AI-DocGen is under active development. We're working on:
 - [ ] Multi-monitor support
 - [ ] Custom documentation templates
 - [ ] Cloud storage integration
@@ -182,5 +184,5 @@ ScreenDoc is under active development. We're working on:
 ## 💡 Feature Requests
 
 Have an idea? We'd love to hear it!
-1. Check existing [Feature Requests](https://github.com/yourusername/ScreenDoc/labels/enhancement)
-2. Open a new [Discussion](https://github.com/yourusername/ScreenDoc/discussions/new)
+1. Check existing [Feature Requests](https://github.com/CactusQuill/AI-DocGen/labels/enhancement)
+2. Open a new [Discussion](https://github.com/CactusQuill/AI-DocGen/discussions/new)
