@@ -1,0 +1,12 @@
+opencv-python>=4.8.0
+numpy>=1.24.0
+pillow>=10.0.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+mss>=9.0.1
+ffmpeg-python>=0.2.0
+markdown>=3.5.1
+python-markdown-math>=0.8
+reportlab>=4.0.7
+python-multipart>=0.0.6
+google-generativeai>=0.3.0
