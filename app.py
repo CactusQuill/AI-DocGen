@@ -170,30 +170,103 @@ elif selected == "Review":
         with video_col:
             st.markdown("### Video Preview")
             try:
-                # Get relative path for video display
                 video_path = Path(st.session_state.output_path)
-                video_bytes = video_path.read_bytes()
-                
-                # Create a unique key for the video player
-                video_key = f"video_{hash(str(video_path))}"
-                st.video(video_bytes, key=video_key)
+                if not video_path.exists():
+                    st.error("Video file not found!")
+                else:
+                    # Read video file in binary mode
+                    with open(video_path, 'rb') as video_file:
+                        video_bytes = video_file.read()
+                        
+                    # Create a download button for the video
+                    st.download_button(
+                        label="Download Video",
+                        data=video_bytes,
+                        file_name=video_path.name,
+                        mime="video/mp4"
+                    )
+                    
+                    # Display video with error handling
+                    try:
+                        st.video(video_bytes, format="video/mp4")
+                    except Exception as e:
+                        st.error(f"Error displaying video. Try downloading it instead. Error: {str(e)}")
+                        
+                        # Fallback: show first frame as image
+                        try:
+                            import cv2
+                            cap = cv2.VideoCapture(str(video_path))
+                            ret, frame = cap.read()
+                            if ret:
+                                st.image(frame, channels="BGR", caption="First frame of the recording")
+                            cap.release()
+                        except Exception as e2:
+                            st.error(f"Could not show preview frame: {str(e2)}")
             except Exception as e:
-                st.error(f"Error loading video: {str(e)}")
+                st.error(f"Error accessing video file: {str(e)}")
+            
+            # Step Detection Settings
+            st.markdown("### Step Detection Settings")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                similarity_threshold = st.slider(
+                    "Similarity Threshold",
+                    min_value=0.5,
+                    max_value=1.0,
+                    value=0.85,
+                    step=0.05,
+                    help="Lower values will detect more subtle changes (more steps), higher values will only detect significant changes (fewer steps)"
+                )
+            
+            with col2:
+                min_time_between = st.slider(
+                    "Minimum Time Between Steps (seconds)",
+                    min_value=0.1,
+                    max_value=5.0,
+                    value=1.0,
+                    step=0.1,
+                    help="Minimum time that must pass between detected steps"
+                )
             
             if st.button("Detect Steps"):
                 with st.spinner("Detecting steps..."):
-                    detector = StepDetector()
+                    detector = StepDetector(
+                        similarity_threshold=similarity_threshold,
+                        min_time_between_steps=min_time_between
+                    )
                     steps = detector.detect_steps(str(video_path), st.session_state.timestamps)
+                    
+                    # Save detection parameters
+                    st.session_state.similarity_threshold = similarity_threshold
+                    st.session_state.min_time_between = min_time_between
+                    
                     # Save screenshots
                     screenshot_paths = detector.save_screenshots(steps, str(screenshots_dir))
                     st.session_state.steps = steps
                     st.session_state.screenshot_paths = screenshot_paths
                     st.success(f"Detected {len(steps)} steps!")
+                    
+                    # Show detection summary
+                    st.info(f"""
+                        Detection Summary:
+                        - Similarity Threshold: {similarity_threshold}
+                        - Min Time Between Steps: {min_time_between}s
+                        - Total Steps Detected: {len(steps)}
+                    """)
                     st.rerun()
         
         with steps_col:
             if st.session_state.steps:
                 st.markdown("### Detected Steps")
+                
+                # Show current detection settings if available
+                if hasattr(st.session_state, 'similarity_threshold'):
+                    st.markdown(f"""
+                        *Current Detection Settings:*
+                        - Similarity: {st.session_state.similarity_threshold}
+                        - Min Time: {st.session_state.min_time_between}s
+                    """)
                 
                 # Add select all/none buttons
                 col1, col2 = st.columns(2)

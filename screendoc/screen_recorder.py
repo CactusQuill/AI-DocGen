@@ -53,20 +53,51 @@ class ScreenRecorder:
                 return None, []
                 
             timestamp = time.strftime("%Y%m%d_%H%M%S")
-            output_path = str(self.output_dir / f"recording_{timestamp}.mp4")
+            temp_output = str(self.output_dir / f"temp_{timestamp}.avi")
+            final_output = str(self.output_dir / f"recording_{timestamp}.mp4")
             
             height, width = self.frames[0].shape[:2]
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            out = cv2.VideoWriter(output_path, fourcc, 30.0, (width, height))
+            
+            # First save as AVI with raw frames
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            out = cv2.VideoWriter(temp_output, fourcc, 30.0, (width, height))
             
             for frame in self.frames:
                 out.write(frame)
-                
+            
             out.release()
             timestamps = self.timestamps.copy()
             self.frames = []
             self.timestamps = []
-            return output_path, timestamps
+            
+            # Convert to web-compatible MP4 using ffmpeg
+            import subprocess
+            try:
+                # Ensure the conversion is done with web-compatible settings
+                subprocess.run([
+                    'ffmpeg', '-i', temp_output,
+                    '-c:v', 'libx264',  # Use H.264 codec
+                    '-preset', 'medium',  # Balance between speed and quality
+                    '-crf', '23',  # Quality level (lower is better, 23 is default)
+                    '-movflags', '+faststart',  # Enable fast start for web playback
+                    '-y',  # Overwrite output file if it exists
+                    final_output
+                ], check=True, capture_output=True)
+                
+                # Remove temporary file
+                import os
+                os.remove(temp_output)
+                
+                return final_output, timestamps
+            except subprocess.CalledProcessError as e:
+                print(f"FFmpeg error: {e.stderr.decode()}")
+                # If ffmpeg fails, return the original AVI file
+                import shutil
+                shutil.move(temp_output, final_output)
+                return final_output, timestamps
+            except Exception as e:
+                print(f"Error during conversion: {e}")
+                return temp_output, timestamps
         
     def capture_screenshot(self, monitor: int = 1) -> np.ndarray:
         """Capture a single screenshot.
