@@ -44,7 +44,7 @@ recordings/
 documentation_*.pdf
 documentation_*.html
 documentation_*.md
-*.png
+
 *.jpg
 *.jpeg
 !assets/*.png
