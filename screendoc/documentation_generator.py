@@ -6,6 +6,7 @@ from typing import List, Dict
 from PIL import Image
 import google.generativeai as genai
 from fpdf import FPDF
+from io import BytesIO
 import markdown
 import pdfkit
 import time
@@ -102,13 +103,18 @@ class DocumentationGenerator:
         try:
             # Load current screenshot
             with open(screenshot_path, 'rb') as img_file:
-                current_image_data = img_file.read()
-            
+                try:
+                  current_image_data = Image.open(BytesIO(img_file.read()))
+                except Exception as e:
+                    print(f"Error opening image: {e}")
             # Load previous screenshot if available
             prev_image_data = None
             if prev_screenshot and Path(prev_screenshot).exists():
                 with open(prev_screenshot, 'rb') as img_file:
-                    prev_image_data = img_file.read()
+                    try:
+                      prev_image_data = Image.open(BytesIO(img_file.read()))
+                    except Exception as e:
+                      print(f"Error opening image: {e}")
             
             # Create prompt based on context
             if prev_image_data:

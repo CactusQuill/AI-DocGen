@@ -1,14 +1,18 @@
 streamlit>=1.24.0
+streamlit-option-menu
+streamlit_extras
+streamlit_lottie
 opencv-python>=4.8.0
 numpy>=1.24.0
 Pillow>=10.0.0
+
 google-generativeai>=0.3.0
 python-dotenv>=1.0.0
 fpdf>=1.7.2
 markdown>=3.0
 pdfkit>=1.0.0
 mss>=9.0.0
-python-opencv>=4.8.0
+#python-opencv>=4.8.0
 ffmpeg-python>=0.2.0
 
 # Development dependencies
