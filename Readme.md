@@ -125,7 +125,20 @@ We welcome contributions! Please follow these steps:
    flake8
    black .
    ```
+4. Create file ~/.streamlit/config.toml for long time recording and upload biger viedo file.
 
+content of file ~/.streamlit/config.toml:
+```
+[server]
+# Set the maximum size of an uploaded file (in megabytes)
+maxUploadSize = 1000  # Set the upload limit to 100MB (default is 200MB)
+
+# Increase the maximum allowed memory usage (in megabytes)
+# Default limit is typically 1GB (1024MB)
+# Example of setting 2GB:
+
+headless = true
+```
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -167,6 +180,9 @@ For detailed documentation, visit our [Wiki](https://github.com/CactusQuill/AI-D
 - Read our [FAQ](https://github.com/CactusQuill/AI-DocGen/wiki/FAQ)
 
 ## 🔄 Updates
+
+- [X] Video file upload
+- [X] Long time video recording
 
 Stay updated with new releases:
 - Watch this repository
