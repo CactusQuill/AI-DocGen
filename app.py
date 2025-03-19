@@ -6,7 +6,11 @@ import requests
 import json
 from pathlib import Path
 import os
+import numpy as np
 from screendoc import ScreenRecorder, StepDetector, DocumentationGenerator
+import time
+import tempfile
+import cv2
 
 # Page config
 st.set_page_config(
@@ -68,6 +72,35 @@ def load_lottie_url(url: str):
         return None
     return r.json()
 
+def process_video(video_file):
+    # Създаваме временен файл за каченото видео
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_file.write(video_file.read())  # Записваме каченото видео
+        temp_file_path = temp_file.name  # Вземаме пътя до временния файл
+
+    # Отваряме видеото с OpenCV
+    cap = cv2.VideoCapture(temp_file_path)
+    
+    if not cap.isOpened():
+        st.error("Не може да се отвори видео файла.")
+        return []
+    
+    timestamps = []  # Списък за времеви печати на кадрите
+    frame_rate = cap.get(cv2.CAP_PROP_FPS)  # Получаваме FPS (кадри в секунда)
+    
+    # Четене на кадрите от видеото
+    while True:
+        ret, frame = cap.read()  # Четем следващия кадър
+        if not ret:
+            break  # Ако няма повече кадри, прекратяваме цикъла
+        
+        timestamp = time.time()  # Вземаме текущото време
+        timestamps.append(timestamp)  # Добавяме времевия печат в списъка
+
+    # Затваряме видеото след обработката
+    cap.release()
+
+    return timestamps
 # Initialize session state variables
 if 'recording' not in st.session_state:
     st.session_state.recording = False
@@ -91,7 +124,7 @@ output_dir = Path("output")
 recordings_dir = output_dir / "recordings"
 screenshots_dir = output_dir / "screenshots"
 docs_dir = output_dir / "docs"
-
+timestamps1 = []
 for dir_path in [output_dir, recordings_dir, screenshots_dir, docs_dir]:
     dir_path.mkdir(parents=True, exist_ok=True)
 
@@ -126,7 +159,24 @@ if selected == "Record":
                     <p>Click "Stop Recording" when you're done.</p>
                 </div>
             """, unsafe_allow_html=True)
-            
+        st.title("Upload and Display Video")
+        # File uploader widget to upload a video
+        video_file = st.file_uploader("Choose a video...", type=["mp4", "mov", "avi", "mkv"])
+        if video_file is not None:
+          timestamps = process_video(video_file)  # Извикваме функцията за обработка на видеото
+        video_path = recordings_dir / "temp.avi" 
+        if video_file:
+          with open(video_path, "wb") as f:
+              f.write(video_file.getbuffer())
+
+          with st.spinner("Convert video"):
+            recorder = ScreenRecorder(str(recordings_dir))
+            st.session_state.recorder = recorder
+            st.session_state.recording = False
+            video_file, timestamps1 = st.session_state.recorder.stop_recording()
+            st.session_state.output_path = video_file
+            st.session_state.timestamps = timestamps
+
         # Recording controls
         if not st.session_state.recording:
             if st.button("Start Recording", key="start_recording"):
@@ -142,20 +192,25 @@ if selected == "Record":
                 st.rerun()
         else:
             if st.button("Stop Recording", key="stop_recording"):
-                if st.session_state.recorder:
-                    st.session_state.recording = False
-                    # Stop recording and save
-                    video_path, timestamps = st.session_state.recorder.stop_recording()
-                    if video_path:
-                        st.session_state.output_path = video_path
-                        st.session_state.timestamps = timestamps
-                        st.success(f"Recording saved successfully!")
-                    else:
-                        st.error("No frames were recorded. Please try again.")
-                    # Clean up
-                    st.session_state.recorder = None
-                    st.session_state.recording_thread = None
-                    st.rerun()
+                with st.spinner("Convert video"):
+                  try:  
+                    if st.session_state.recorder:
+                        st.session_state.recording = False
+                        # Stop recording and save
+                        video_path, timestamps = st.session_state.recorder.stop_recording()
+                        if video_path:
+                            st.session_state.output_path = video_path
+                            st.session_state.timestamps = timestamps
+                            st.success(f"Recording saved successfully!")
+                        else:
+                            st.error("No frames were recorded. Please try again.")
+                        # Clean up
+                        st.session_state.recorder = None
+                        st.session_state.recording_thread = None
+                        st.rerun()
+                  except Exception as e2:
+                    st.error(f"Could not convert video: {str(e2)}")
+     
     
     with col2:
         st.markdown("### Recording Settings")
@@ -335,7 +390,7 @@ elif selected == "Review":
                     st.success("Steps deleted successfully!")
                     st.rerun()
     else:
-        st.info("Please record a video first!")
+          st.info("Please record a video first!")
 
 elif selected == "Generate":
     if st.session_state.steps and hasattr(st.session_state, 'screenshot_paths'):

@@ -135,7 +135,7 @@ Previous screenshot shows the starting state, current screenshot shows the resul
 4. Highlight any system status or feedback messages
 5. Suggest what actions might be available or required
 
-Focus on being specific and actionable. Use clear, professional language."""
+Focus on being specific and actionable. Use clear, professional language ."""
 
             # Add retry logic with exponential backoff
             max_retries = self.max_retries
@@ -338,6 +338,7 @@ Focus on cause-and-effect or sequential relationship. Be concise and professiona
         for i, step in enumerate(steps, 1):
             image_path = screenshot_paths.get(i-1)
             description = step.description if hasattr(step, 'description') and step.description else f"Step {i}"
+            #description = f"Step {i}"
             pdf.add_step(i, description, image_path)
         
         # Save the PDF
